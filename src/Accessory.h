@@ -1,7 +1,8 @@
 #ifndef Accessory_h
 #define Accessory_h
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <Wire.h>
 
 //
 
@@ -76,7 +77,7 @@ public:
 
 	void addMultiplexer(uint8_t iic, uint8_t sw);
 	void switchMultiplexer();
-	static void switchMultiplexer(uint8_t iic, uint8_t sw);
+	void switchMultiplexer(uint8_t iic, uint8_t sw);
 
 	int decodeInt(uint8_t msbbyte, uint8_t msbstart, uint8_t msbend,
 			uint8_t csbbyte, uint8_t csbstart, uint8_t csbend, uint8_t lsbbyte,
@@ -235,7 +236,7 @@ protected:
 	void _burstWriteWithAddress(uint8_t addr, uint8_t* arr, uint8_t size);
 
 private:
-	static void sendMultiSwitch(uint8_t iic, uint8_t sw);
+	void sendMultiSwitch(uint8_t iic, uint8_t sw);
 
 	uint8_t mapCount;
 	TwoWire* _wire;
