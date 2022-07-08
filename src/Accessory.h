@@ -69,7 +69,7 @@ public:
 
 	void printInputs(Stream& stream = Serial);
 
-	void begin();
+	void begin(TwoWire* wire = &Wire);
 	boolean readData();
 
 	void enableEncryption(bool enc);
@@ -238,6 +238,7 @@ private:
 	static void sendMultiSwitch(uint8_t iic, uint8_t sw);
 
 	uint8_t mapCount;
+	TwoWire* _wire;
 };
 
 #endif
