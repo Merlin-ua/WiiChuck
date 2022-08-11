@@ -3,6 +3,7 @@
 
 Accessory::Accessory() {
 	type = NUNCHUCK;
+	begin_state = START;
 }
 /**
  * Reads the device type from the controller
@@ -280,6 +281,44 @@ void Accessory::begin(TwoWire* wire) {
 	_burstRead();
 }
 
+bool Accessory::asyncBegin(TwoWire* wire) {
+	switch (begin_state) {
+		case START:
+			_wire = wire;
+			_wire->begin();
+
+			_writeRegister(0xF0, 0x55);
+			_writeRegister(0xFB, 0x00);
+
+			begin_t = millis();
+			begin_state = FIRST;
+			return false;
+		case FIRST:
+			if (millis() - begin_t > 100) {
+				type = identifyController();
+				begin_t = millis();
+				begin_state = SECOND;
+			}
+			return false;
+		case SECOND:
+			if (millis() - begin_t > 100) {
+				_burstRead();
+				begin_t = millis();
+				begin_state = THIRD;
+			}
+			return false;
+		case THIRD:
+			if (millis() - begin_t > 100) {
+				_burstRead();
+				begin_state = START;
+				return true;
+			}
+			return false;
+	}
+	Serial.println("Unknown begin_state");
+	return true;
+}
+
 boolean Accessory::_burstRead(uint8_t addr) {
 	//int readAmnt = dataArraySize;
 	uint8_t err = 0;
@@ -360,8 +399,10 @@ boolean Accessory::_burstRead(uint8_t addr) {
 		}
 		if(dataBad || (err != 0) ){
 			if((err != 0)){
+/*
 				Serial.println(	"\nI2C error code _burstRead error: " + String(err)
 												+ " repeted: " + String(b+1));
+*/
 				if(err==5){
 					begin();
 				}

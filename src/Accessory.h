@@ -54,6 +54,13 @@ typedef enum _controllertype {
 	Turntable
 } ControllerType;
 
+typedef enum {
+	START,
+	FIRST,
+	SECOND,
+	THIRD
+} BeginState;
+
 class Accessory: public Classic,
 		public DJTable,
 		public Nunchuck,
@@ -71,6 +78,7 @@ public:
 	void printInputs(Stream& stream = Serial);
 
 	void begin(TwoWire* wire = &Wire);
+	bool asyncBegin(TwoWire* wire = &Wire);
 	boolean readData();
 
 	void enableEncryption(bool enc);
@@ -240,6 +248,9 @@ private:
 
 	uint8_t mapCount;
 	TwoWire* _wire;
+
+	BeginState begin_state;
+	unsigned long begin_t;
 };
 
 #endif
